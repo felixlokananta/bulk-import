@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Customer extends Model
+class ImportJob extends Model
 {
     use HasFactory;
 
@@ -15,16 +15,15 @@ class Customer extends Model
      * @var array
      */
     protected $fillable = [
-        'email',
-        'first_name',
-        'last_name'
+        'status',
+        'csv_path'
     ];
 
     /**
      * Get the associate orders for a customer
      */
-    public function orders()
+    public function records()
     {
-        return $this->hasMany(Order::class);
+        return $this->hasMany(ImportJobRecord::class);
     }
 }

@@ -5,7 +5,7 @@ namespace App\Models\Repositories;
 abstract class BaseRepository
 {
     protected $model;
-    protected $pageSizeConfig = 'main.CORE_PAGE_DEFAULT';
+    protected $pageSizeConfig = 'main.core_page_default';
 
     /**
      */

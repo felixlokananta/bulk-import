@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,3 +21,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::get('/test', [Controller::class, 'test'])->name('testApi');
+
+
+Route::post('/order-upload', [OrderController::class, 'uploadOrderCsvFile'])->name('order-csv-upload');

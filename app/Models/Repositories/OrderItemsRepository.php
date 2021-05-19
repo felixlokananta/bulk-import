@@ -2,12 +2,12 @@
 
 namespace App\Models\Repositories;
 
-use App\Models\Customer;
+use App\Models\OrderItems;
 
-Class CustomerRepository extends BaseRepository
+Class OrderItemsRepository extends BaseRepository
 {
-    public function __construct(Customer $customer)
+    public function __construct(OrderItems $orderItems)
     {
-        $this->model = $customer;
+        $this->model = $orderItems;
     }    
 }

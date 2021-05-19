@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCustomersTable extends Migration
+class CreateImportJobsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class CreateCustomersTable extends Migration
      */
     public function up()
     {
-        Schema::create('customers', function (Blueprint $table) {
+        Schema::create('import_jobs', function (Blueprint $table) {
             $table->id();
-            $table->string('email')->unique();
-            $table->string('first_name');
-            $table->string('last_name');
+            $table->enum('status',['dispatched', 'finished']);
+            $table->text('csv_path');
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ class CreateCustomersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('customers');
+        Schema::dropIfExists('import_jobs');
     }
 }

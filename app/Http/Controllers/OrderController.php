@@ -2,29 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\ProcessBulkImport;
 use App\Models\Order;
+use App\Models\Repositories\ImportJobRepository;
 use Illuminate\Http\Request;
+use App\Services\FileManagementService;
 
 class OrderController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
+    private $fileManagementService;
+    private $importJobRepository;
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function __construct(FileManagementService $fileManagementService, ImportJobRepository $importJobRepository)
     {
-        //
+        $this->fileManagementService = $fileManagementService;
+        $this->importJobRepository = $importJobRepository;
     }
 
     /**
@@ -33,53 +25,30 @@ class OrderController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function uploadOrderCsvFile(Request $request)
     {
-        //
-    }
+        $maxSize = config('main.csv_max_size');
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Order  $order
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Order $order)
-    {
-        //
-    }
+        $validatedData = $request->validate([
+            'file' => 'required|mimes:csv,txt|max:' . $maxSize
+        ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Order  $order
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Order $order)
-    {
-        //
-    }
+        $fileData = [
+            'name' => $request->file('file')->getClientOriginalName(),
+            'path' => 'uploads/'
+        ];
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Order  $order
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Order $order)
-    {
-        //
-    }
+        $storagePath = $this->fileManagementService->upload($request->file('file'), $fileData);
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Order  $order
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Order $order)
-    {
-        //
+        if ($storagePath) {
+            $importJobData = [
+                'status' => 'dispatched',
+                'csv_path' => $storagePath,
+            ];
+            $importJob =  $this->importJobRepository->create($importJobData);
+            dispatch(new ProcessBulkImport($importJob));
+        }
+
+        return response()->json($importJob, 200);
     }
 }

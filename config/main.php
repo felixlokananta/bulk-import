@@ -1,7 +1,6 @@
 <?php
 
 return [
-
-    'CORE_PAGE_DEFAULT' => '15',
-
+    'core_page_default' => 15,
+    'csv_max_size' => 2048,
 ];

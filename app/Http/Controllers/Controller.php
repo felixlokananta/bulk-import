@@ -13,6 +13,6 @@ class Controller extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     public function test(Request $request) {
-        return response()->json('dari test api', 200);
+        return phpinfo();
     }
 }
