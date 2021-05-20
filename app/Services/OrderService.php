@@ -96,7 +96,6 @@ class OrderService
             DB::rollBack();
             $recordLog['reason'] = $e->getMessage();
         }
-        // create a new event here for broadcasting the feedback
     }
 
 }

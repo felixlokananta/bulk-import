@@ -15,15 +15,24 @@ class ImportJob extends Model
      * @var array
      */
     protected $fillable = [
+        'user_id',
         'status',
-        'csv_path'
+        'csv_path',
     ];
 
     /**
-     * Get the associate orders for a customer
+     * Get the associate records for this bulk import job
      */
     public function records()
     {
         return $this->hasMany(ImportJobRecord::class);
+    }
+
+    /**
+     * Get the associate owner for this bulk import job
+     */
+    public function owner()
+    {
+        return $this->belongsTo(User::class);
     }
 }

@@ -2,10 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Events\BulkImportOrderProcessed;
 use App\Models\Repositories\ImportJobRecordRepository;
 use App\Models\Repositories\ImportJobRepository;
-use App\Models\Repositories\OrderRepository;
-use App\Services\FileManagementService;
 use App\Services\OrderService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -40,26 +39,44 @@ class ProcessBulkImport implements ShouldQueue
         ImportJobRepository $importJobRepository,
         ImportJobRecordRepository $importJobRecordRepository,
         OrderService $orderService
-
     )
     {
         $reader = Reader::createFromPath($this->csvPath);
-        $header = $reader->getHeader();
-        $orders = $reader->getRecords($header);
+        $reader->setHeaderOffset(0);
+        $orders = $reader->getRecords();
+        $numOfFailed = 0;
+        $numOfImported = 0;
 
         foreach ($orders as $key => $order) {
             $recordLog = [
                 'job_id' => $this->job->id,
                 'record' => $order
             ];
-            if (!$orderService->checkIfOrderAccurate($order, $recordLog)) {
-                $recordLog['status'] = 'failed';
-                $importJobRecordRepository->create($recordLog);
-            } else {
+            if ($orderService->checkIfOrderAccurate($order, $recordLog)) {
                 $orderService->processOrder($order, $recordLog);
             }
+
+            if (is_null($recordLog['reason'])) {
+                $recordLog['status'] = 'imported';
+                $numOfImported++;
+            } else {
+                $recordLog['status'] = 'failed';
+                $numOfFailed++;
+            }
+
+            $importJobRecordRepository->create($recordLog);
+
+            $progress = [
+                'order_processed' => $key,
+                'order_count' => count($reader),
+                'imported_order' => $numOfImported,
+                'failed_order' => $numOfFailed
+            ];
+            // create a new event for broadcast right here. 
+            event(new BulkImportOrderProcessed($progress, $this->job));
         }
 
-        
+        // update the dispatched job.
+        $importJobRepository->update($this->job->id,['status' => 'finished']);
     }
 }

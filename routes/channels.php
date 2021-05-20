@@ -13,6 +13,6 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
-Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
+Broadcast::channel('bulkImportJob.{job}', function ($user, \App\Models\ImportJob $job) {
+    return $job->user_id === $user->id;
 });

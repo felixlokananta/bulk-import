@@ -15,6 +15,8 @@ class CreateImportJobsTable extends Migration
     {
         Schema::create('import_jobs', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->enum('status',['dispatched', 'finished']);
             $table->text('csv_path');
             $table->timestamps();

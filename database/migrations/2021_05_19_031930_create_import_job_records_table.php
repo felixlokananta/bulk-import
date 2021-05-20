@@ -15,7 +15,7 @@ class CreateImportJobRecordsTable extends Migration
     {
         Schema::create('import_job_records', function (Blueprint $table) {
             $table->id();
-            $table->bigIncrements('job_id');
+            $table->unsignedBigInteger('job_id');
             $table->foreign('job_id')->references('id')->on('import_jobs');
             $table->text('record');
             $table->string('reason')->nullable();
