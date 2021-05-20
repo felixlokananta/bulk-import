@@ -16,6 +16,7 @@ class Customer extends Model
      */
     protected $fillable = [
         'email',
+        'user_id',
         'first_name',
         'last_name'
     ];
@@ -26,5 +27,13 @@ class Customer extends Model
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Get the user owner for a customer
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }
